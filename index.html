@@ -283,8 +283,8 @@
 
         function handleCitySearch() {
             const city = cityInput.value.trim();
-            if (!city || city === '📍 Location') {
-                statusMessage.textContent = '⚠️ Please enter a valid city name to search.';
+            if (!city || city === ' Location') {
+                statusMessage.textContent = 'Please enter a valid city name to search.';
                 return;
             }
             handleApiRequest(false);
@@ -292,7 +292,7 @@
         
         async function onMapClick(e) {
             const { lat, lng } = e.latlng;
-            cityInput.value = `📍 Location`;
+            cityInput.value = ` Location`;
             await handleApiRequest(true, lat, lng);
         }
 
@@ -313,7 +313,7 @@
                 displayResults(data);
                 statusMessage.textContent = '';
             } catch (error) {
-                statusMessage.textContent = `❌ Error: ${error.message}`;
+                statusMessage.textContent = ` Error: ${error.message}`;
             } finally {
                 loader.style.display = 'none';
             }
