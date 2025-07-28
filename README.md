@@ -10,7 +10,6 @@
 <p align="center">
     <img src="https://img.shields.io/badge/Python-3.9-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python Version">
     <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="Pandas">
-    <img src="https://img.shields.io/badge/Scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-learn">
     <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask">
 </p>
 
@@ -40,10 +39,17 @@ This project is an end-to-end data science application designed to analyze and p
 
 ## ✨ Key Features
 
-- **In-Depth Data Analysis:** Comprehensive exploratory data analysis (EDA) to uncover relationships and trends between different pollutants.
-- **Time-Series Forecasting:** Utilizes Facebook's Prophet model to accurately forecast future AQI based on historical data patterns.
-- **Interactive Web Application:** A live, user-friendly dashboard featuring interactive maps with Leaflet.js and dynamic charts with Chart.js.
-- **Full-Stack & Reproducible:** The repository contains all necessary front-end, back-end, and deployment code to reproduce the application.
+-  AI-Powered Forecasting: Utilizes the Prophet library to predict the AQI for the next 24 hours based on recent trends.
+
+-  Interactive Map: A fully interactive Leaflet.js map allows users to click any location on the globe to get an instant AQI reading and forecast.
+
+-  Dynamic UI: The background elegantly transitions between a day and night sky based on the user's local time, enhancing the user experience.
+
+-  Detailed Data Visualization: Displays the current AQI on an animated gauge, breaks down key pollutants (PM₂.₅, O₃, NO₂), and shows the forecast on a clear Chart.js graph.
+
+-  Responsive Design: A modern, two-column dashboard layout that works seamlessly on both desktop and mobile devices.
+
+
 
 ---
 
