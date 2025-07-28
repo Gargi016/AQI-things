@@ -55,24 +55,24 @@ def format_dataframe_for_json(df, columns):
 def get_aqi_forecast_by_city(city):
     """API endpoint to get AQI data for a named city."""
     try:
-        print(f"🔄 Received request for city: {city.title()}...")
+        print(f" Received request for city: {city.title()}...")
         url = f"https://api.waqi.info/feed/{city}/?token={API_KEY}"
         response = requests.get(url)
         return process_waqi_response(response)
     except Exception as e:
-        print(f"🚨 An unexpected error occurred: {e}")
+        print(f"An unexpected error occurred: {e}")
         return jsonify({"status": "error", "message": "An internal server error occurred."}), 500
 
 @app.route("/forecast/geo/<lat>/<lon>")
 def get_aqi_forecast_by_geo(lat, lon):
     """API endpoint to get AQI data using latitude and longitude."""
     try:
-        print(f"🔄 Received request for geo: {lat}, {lon}...")
+        print(f" Received request for geo: {lat}, {lon}...")
         url = f"https://api.waqi.info/feed/geo:{lat};{lon}/?token={API_KEY}"
         response = requests.get(url)
         return process_waqi_response(response)
     except Exception as e:
-        print(f"🚨 An unexpected error occurred: {e}")
+        print(f" An unexpected error occurred: {e}")
         return jsonify({"status": "error", "message": "An internal server error occurred."}), 500
 
 def process_waqi_response(response):
@@ -112,7 +112,7 @@ def process_waqi_response(response):
         "timestamp": datetime.now().isoformat()
     }
     
-    print(f"✅ Successfully generated forecast for {data_payload['city']['name']}.")
+    print(f"Successfully generated forecast for {data_payload['city']['name']}.")
     return jsonify(response_data)
 
 
