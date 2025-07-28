@@ -52,6 +52,21 @@ This project is an end-to-end data science application designed to analyze and p
 
 
 ---
+## ⚙️ How It Works
+
+The application follows a simple but powerful full-stack architecture:
+
+1.  **Front-End (Client):** The user interacts with the `index.html` page, either searching for a city or clicking on the map. This action triggers a JavaScript function.
+2.  **API Request:** The JavaScript front-end sends a `fetch` request to the appropriate API endpoint on the Flask back-end (e.g., `/forecast/london` or `/forecast/geo/51.5/-0.12`).
+3.  **Back-End (Server):** The Flask application receives the request.
+    * It calls the external **WAQI API** to get real-time air quality data.
+    * It simulates a 72-hour history based on the current AQI.
+    * It feeds this historical data into the **Prophet model** to generate a 24-hour forecast.
+4.  **API Response:** The Flask server packages the current data, pollutant info, and the forecast into a JSON object and sends it back to the front-end.
+5.  **UI Update:** The front-end JavaScript receives the JSON data and dynamically updates the map, gauge, pollutant cards, and forecast chart.
+
+---
+
 
 ## 🛠️ Tech Stack
 
