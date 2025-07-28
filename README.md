@@ -72,9 +72,11 @@ The application follows a simple but powerful full-stack architecture:
 
 This project was built using the following technologies:
 
-| Python | Flask | Prophet | Pandas | JavaScript | Render |
-| :---: | :---: | :---: | :---: | :---: | :---: |
+| Python | Flask | Prophet | Pandas | JavaScript | Render | HTML | CSS | 
+| :---: | :---: | :---: | :---: | :---: | :---: |         |      | 
 | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="48" height="48"/> | <img src="https://github.com/Gargi016/AQI-things/raw/main/docs/images/flask.jpeg" alt="flask" width="48" height="48"/> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/facebook/facebook-original.svg" alt="prophet" width="48" height="48"/> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/pandas/pandas-original.svg" alt="pandas" width="48" height="48"/> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="48" height="48"/> | <img src="https://github.com/Gargi016/AQI-things/raw/main/docs/images/render.jpeg" alt="render" width="48" height="48"/> |
+<img src="https://github.com/Gargi016/AQI-things/raw/main/docs/images/html.jpeg" alt="html" width="48" height="48"/> |
+<img src="https://github.com/Gargi016/AQI-things/raw/main/docs/images/css1.jpeg" alt="css" width="48" height="48"/> |
 
 ---
 
