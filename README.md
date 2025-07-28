@@ -94,9 +94,6 @@ This project was built using the following technologies:
     pip install -r requirements.txt
     ```
 
-3.  **Explore the Analysis**
-    Open and run the Jupyter notebooks (`.ipynb` files) in the repository to see the full data analysis and model training process.
-
 </details>
 
 ---
