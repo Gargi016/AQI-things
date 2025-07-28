@@ -5,22 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AQI Forecaster Dashboard</title>
     
-    <!-- LeafletJS for Map -->
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     
-    <!-- Chart.js for Charts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     
-    <!-- Google Fonts -->
+   
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* Color Palette */
+           
             --color-bg: #111827;
             --color-surface: rgba(31, 41, 55, 0.5);
             --color-border: rgba(75, 85, 99, 0.5);
@@ -28,7 +27,7 @@
             --color-text-secondary: #9ca3af;
             --color-accent: #38bdf8;
 
-            /* AQI Status Colors */
+            
             --fg-good: #34d399;
             --fg-moderate: #fbbf24;
             --fg-unhealthy-sensitive: #fb923c;
@@ -37,19 +36,19 @@
             --fg-hazardous: #f472b6;
         }
 
-        /* --- Base & Typography --- */
+      
         * { box-sizing: border-box; }
         html { font-size: 100%; }
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--color-bg); /* Fallback color */
+            background-color: var(--color-bg);
             color: var(--color-text-primary);
             margin: 0;
             padding: 1rem;
             min-height: 100vh;
             overflow-x: hidden;
-            /* background-image is set by JS */
+           
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -59,9 +58,9 @@
         h1 { font-size: 1.875rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
         h3 { font-size: 1.125rem; font-weight: 600; margin-top: 0; margin-bottom: 1rem; }
 
-        /* --- Main Dashboard Layout --- */
+        
         .dashboard {
-            position: relative; /* Needed to appear above the background */
+            position: relative; 
             z-index: 1;
             display: grid;
             grid-template-columns: 1fr;
@@ -86,7 +85,7 @@
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
 
-        /* --- Main Content Area (Map & Search) --- */
+       
         .main-content {
             display: flex;
             flex-direction: column;
@@ -102,14 +101,14 @@
         .leaflet-control-zoom a { color: var(--color-text-primary) !important; background-color: var(--color-surface) !important; }
         .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--color-surface) !important; color: var(--color-text-primary) !important; box-shadow: none; border-radius: 0.5rem; }
 
-        /* --- Sidebar (Results) --- */
+      
         .sidebar {
             display: flex;
             flex-direction: column;
             gap: 1.5rem;
         }
 
-        /* --- UI Components --- */
+     
         .form-container { display: flex; gap: 0.75rem; }
         #city-input {
             flex-grow: 1; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid var(--color-border);
@@ -130,7 +129,7 @@
         }
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        /* --- AQI Gauge Redesign --- */
+        
         .gauge-container { text-align: center; }
         .gauge-display {
             position: relative;
@@ -174,7 +173,7 @@
 <body>
 
     <div class="dashboard">
-        <!-- Main content column -->
+ 
         <main class="main-content">
             <header>
                 <h1>AQI things</h1>
@@ -185,7 +184,7 @@
             </div>
         </main>
         
-        <!-- Sidebar column for results -->
+       
         <aside class="sidebar">
             <div class="card">
                  <div class="form-container">
@@ -196,7 +195,7 @@
                 <div class="loader" id="loader"></div>
             </div>
 
-            <!-- This container will hold all result cards -->
+            
             <div id="results-container" class="hidden">
                 <div class="card fade-in">
                     <div class="gauge-container">
@@ -225,7 +224,7 @@
     </div>
 
     <script>
-        // --- DOM Element References ---
+     
         const cityInput = document.getElementById('city-input');
         const submitBtn = document.getElementById('submit-btn');
         const statusMessage = document.getElementById('status-message');
@@ -233,18 +232,18 @@
         const resultsContainer = document.getElementById('results-container');
         let combinedChart, map, marker;
 
-        // --- Chart.js Global Config ---
+       
         Chart.defaults.color = '#9ca3af';
         Chart.defaults.borderColor = 'rgba(75, 85, 99, 0.5)';
         
-        // --- Initialization & Event Listeners ---
+     
         document.addEventListener('DOMContentLoaded', () => {
-            setDynamicBackground(); // Set the background based on time
+            setDynamicBackground(); 
             initializeMap();
             const lastCity = localStorage.getItem('lastCity');
             if (lastCity) {
                 cityInput.value = lastCity;
-                handleCitySearch(); // Use the dedicated search handler
+                handleCitySearch(); 
             }
         });
 
@@ -254,7 +253,7 @@
             if (event.key === 'Enter') handleCitySearch();
         });
 
-        // --- Core Functions ---
+
         function setDynamicBackground() {
             const hour = new Date().getHours();
             const body = document.body;
@@ -274,7 +273,7 @@
         }
 
         function initializeMap() {
-            map = L.map('map').setView([20, 0], 2); // Default world view
+            map = L.map('map').setView([20, 0], 2); 
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
                 maxZoom: 19
@@ -320,7 +319,7 @@
             }
         }
         
-        // --- UI Update & Helper Functions ---
+       
         function getAqiInfo(aqi) {
             if (aqi <= 50) return { level: "Good", color: 'var(--fg-good)' };
             if (aqi <= 100) return { level: "Moderate", color: 'var(--fg-moderate)' };
@@ -334,7 +333,6 @@
             resultsContainer.classList.remove('hidden');
             const aqiInfo = getAqiInfo(data.current_aqi);
             
-            // 1. Update Map
             const cityCoords = data.city.geo ? [data.city.geo[0], data.city.geo[1]] : map.getCenter();
             if (marker) map.removeLayer(marker);
             marker = L.marker(cityCoords).addTo(map)
@@ -342,7 +340,7 @@
                 .openPopup();
             map.flyTo(cityCoords, 10);
             
-            // 2. Update Gauge
+           
             document.getElementById('aqi-value').textContent = data.current_aqi;
             document.getElementById('aqi-level').textContent = aqiInfo.level;
             const gaugeFill = document.getElementById('gauge-fill');
@@ -351,7 +349,7 @@
             gaugeFill.style.transform = `rotate(${rotation}deg)`;
             gaugeFill.style.borderColor = aqiInfo.color;
 
-            // 3. Update Pollutants
+         
             const pollutantsGrid = document.getElementById('pollutants-grid');
             pollutantsGrid.innerHTML = '';
             const POLLUTANT_NAMES = { pm25: 'PM₂.₅', o3: 'O₃', no2: 'NO₂', so2: 'SO₂', pm10: 'PM₁₀', co: 'CO' };
@@ -365,7 +363,7 @@
                 }
             }
 
-            // 4. Update Chart
+           
             const ctx = document.getElementById('combined-chart').getContext('2d');
             const historyData = { labels: data.history.labels, values: data.history.y };
             const forecastData = { labels: data.forecast.labels, values: data.forecast.yhat };
