@@ -8,13 +8,6 @@
 </p>
 
 <p align="center">
-    <img src="https://img.shields.io/badge/Python-3.9-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python Version">
-    <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white" alt="Pandas">
-    <img src="https://img.shields.io/badge/Scikit--learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-learn">
-    <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white" alt="Streamlit">
-</p>
-
-<p align="center">
   <a href="#-live-demo">Live Demo</a> •
   <a href="#-project-overview">Overview</a> •
   <a href="#-key-features">Key Features</a> •
@@ -26,7 +19,7 @@
 
 ## 🚀 Live Demo
 
-[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://aqi-things-1.onrender.com/)
+[![Live Demo on Render](https://img.shields.io/badge/Live_Demo-Render-brightgreen?style=for-the-badge&logo=render)](https://aqi-things-1.onrender.com/)
 
 **Click the badge above or follow this link to try the live application, hosted on Render:** [https://aqi-things-1.onrender.com/](https://aqi-things-1.onrender.com/)
 
@@ -34,16 +27,16 @@
 
 ## 📖 Project Overview
 
-This project is an end-to-end data science application designed to analyze and predict the **Air Quality Index (AQI)**. Using a dataset of various atmospheric pollutants, this system employs machine learning models to forecast AQI levels, providing valuable insights into environmental health and pollution trends. The entire pipeline, from data cleaning and exploratory data analysis to model training and deployment, is documented in the project's notebooks.
+This project is an end-to-end data science application designed to analyze and predict the **Air Quality Index (AQI)**. Using a dataset of various atmospheric pollutants, this system employs the Prophet time-series forecasting model to predict future AQI levels, providing valuable insights into environmental health and pollution trends. The entire application is deployed as an interactive web service.
 
 ---
 
 ## ✨ Key Features
 
 - **In-Depth Data Analysis:** Comprehensive exploratory data analysis (EDA) to uncover relationships and trends between different pollutants.
-- **Predictive Modeling:** Utilizes machine learning models to accurately forecast AQI based on historical data.
-- **Interactive Web Application:** A live, user-friendly dashboard built with Streamlit allows for easy exploration of the data and model predictions.
-- **End-to-End & Reproducible:** The repository contains all the necessary code and notebooks to reproduce the analysis and results.
+- **Time-Series Forecasting:** Utilizes Facebook's Prophet model to accurately forecast future AQI based on historical data patterns.
+- **Interactive Web Application:** A live, user-friendly dashboard featuring interactive maps with Leaflet.js and dynamic charts with Chart.js.
+- **Full-Stack & Reproducible:** The repository contains all necessary front-end, back-end, and deployment code to reproduce the application.
 
 ---
 
@@ -51,11 +44,9 @@ This project is an end-to-end data science application designed to analyze and p
 
 This project was built using the following technologies:
 
-| Python | Pandas | Scikit-learn | Matplotlib | Streamlit |
-| :---: | :---: | :---: | :---: | :---: |
-| <img src="https://raw.githubusercontent.com/Ritviks21/Silicon-Sentinel/main/docs/images/Python.png" width="48"> | <img src="https://raw.githubusercontent.com/Ritviks21/Silicon-Sentinel/main/docs/images/pandas_logo.png" width="48"> | <img src="https://raw.githubusercontent.com/Ritviks21/Silicon-Sentinel/main/docs/images/scikit-learn_logo.png" width="48"> | <img src="https://raw.githubusercontent.com/Ritviks21/Silicon-Sentinel/main/docs/images/matplotlib_logo.png" width="48"> | <img src="https://raw.githubusercontent.com/Ritviks21/Silicon-Sentinel/main/docs/images/streamlit_logo.png" width="48"> |
-
-*(Note: Placeholder logos are used. They can be replaced with custom images uploaded to the `docs/images` folder.)*
+| Python | Flask | Prophet | Pandas | JavaScript | Render |
+| :---: | :---: | :---: | :---: | :---: | :---: |
+| <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg" alt="python" width="48" height="48"/> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/flask/flask-original.svg" alt="flask" width="48" height="48"/> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/facebook/facebook-original.svg" alt="prophet" width="48" height="48"/> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/pandas/pandas-original.svg" alt="pandas" width="48" height="48"/> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg" alt="javascript" width="48" height="48"/> | <img src="https://www.vectorlogo.zone/logos/render/render-icon.svg" alt="render" width="48" height="48"/> |
 
 ---
 
@@ -79,6 +70,18 @@ This project was built using the following technologies:
     Open and run the Jupyter notebooks (`.ipynb` files) in the repository to see the full data analysis and model training process.
 
 </details>
+
+---
+
+## 🤝 How to Contribute
+
+Contributions are welcome! If you're interested in data science for environmental impact, please feel free to fork the repository and submit a pull request.
+
+### Areas for Contribution
+* **Data:** Integrate new data sources (e.g., weather data, traffic data) to improve model accuracy.
+* **Model:** Experiment with different time-series models (like ARIMA or LSTMs) to compare performance against Prophet.
+* **Front-End:** Enhance the interactivity of the Leaflet.js map or add new visualizations with Chart.js.
+* **Back-End:** Optimize the Flask API for faster performance or add unit tests.
 
 ---
 
