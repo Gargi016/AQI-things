@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AQI things</title>
+    <title>AQI Forecaster Dashboard</title>
     
     <!-- LeafletJS for Map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
@@ -40,19 +40,29 @@
         /* --- Base & Typography --- */
         * { box-sizing: border-box; }
         html { font-size: 100%; }
+        
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--color-bg);
+            background-color: var(--color-bg); /* Fallback color */
             color: var(--color-text-primary);
             margin: 0;
             padding: 1rem;
             min-height: 100vh;
+            overflow-x: hidden;
+            /* background-image is set by JS */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            transition: background-image 1s ease-in-out;
         }
+        
         h1 { font-size: 1.875rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
         h3 { font-size: 1.125rem; font-weight: 600; margin-top: 0; margin-bottom: 1rem; }
 
         /* --- Main Dashboard Layout --- */
         .dashboard {
+            position: relative; /* Needed to appear above the background */
+            z-index: 1;
             display: grid;
             grid-template-columns: 1fr;
             gap: 1.5rem;
@@ -167,7 +177,7 @@
         <!-- Main content column -->
         <main class="main-content">
             <header>
-                <h1>AQI Forecaster Dashboard</h1>
+                <h1>AQI things</h1>
                 <p id="sub-header" style="text-align:center; color: var(--color-text-secondary); margin-top: -0.5rem;">Search for a city or click on the map to get a 24-hour forecast</p>
             </header>
             <div class="card">
@@ -229,20 +239,40 @@
         
         // --- Initialization & Event Listeners ---
         document.addEventListener('DOMContentLoaded', () => {
+            setDynamicBackground(); // Set the background based on time
             initializeMap();
             const lastCity = localStorage.getItem('lastCity');
             if (lastCity) {
                 cityInput.value = lastCity;
-                handleForecastRequest();
+                handleCitySearch(); // Use the dedicated search handler
             }
         });
 
-        submitBtn.addEventListener('click', () => handleForecastRequest());
+        // Use a dedicated function for city searches
+        submitBtn.addEventListener('click', handleCitySearch);
         cityInput.addEventListener('keyup', (event) => {
-            if (event.key === 'Enter') handleForecastRequest();
+            if (event.key === 'Enter') handleCitySearch();
         });
 
         // --- Core Functions ---
+        function setDynamicBackground() {
+            const hour = new Date().getHours();
+            const body = document.body;
+            
+            // Day is roughly 6am to 7pm (19:00)
+            if (hour >= 6 && hour < 19) {
+                // Daytime Sky
+                body.style.backgroundImage = `
+                    linear-gradient(to bottom, rgba(17, 24, 39, 0.1), rgba(17, 24, 39, 0.4)),
+                    url('Skyday.jpg')`;
+            } else {
+                // Nighttime Sky
+                body.style.backgroundImage = `
+                    linear-gradient(to bottom, rgba(17, 24, 39, 0.1), rgba(17, 24, 39, 0.2)),
+                    url('Skynight.jpg')`;
+            }
+        }
+
         function initializeMap() {
             map = L.map('map').setView([20, 0], 2); // Default world view
             L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
@@ -251,19 +281,25 @@
             }).addTo(map);
             map.on('click', onMapClick);
         }
+
+        function handleCitySearch() {
+            const city = cityInput.value.trim();
+            if (!city || city === '📍 Location') {
+                statusMessage.textContent = '⚠️ Please enter a valid city name to search.';
+                return;
+            }
+            handleApiRequest(false);
+        }
         
         async function onMapClick(e) {
             const { lat, lng } = e.latlng;
             cityInput.value = `📍 Location`;
-            await handleForecastRequest(true, lat, lng);
+            await handleApiRequest(true, lat, lng);
         }
 
-        async function handleForecastRequest(isGeo = false, lat = null, lon = null) {
+        async function handleApiRequest(isGeo = false, lat = null, lon = null) {
             const city = cityInput.value.trim();
-            if (!city && !isGeo) {
-                statusMessage.textContent = '⚠️ Please enter a city name.';
-                return;
-            }
+            
             loader.style.display = 'block';
             resultsContainer.classList.add('hidden');
             statusMessage.textContent = `Fetching data...`;
@@ -355,7 +391,7 @@
                         {
                             label: 'Forecasted AQI',
                             data: forecastPaddedData,
-                            borderColor: 'var(--color-accent)',
+                            borderColor: '#38bdf8',
                             borderDash: [5, 5],
                             tension: 0.3,
                             pointRadius: 0,
