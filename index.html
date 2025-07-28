@@ -74,7 +74,7 @@
             }
         }
 
-        /* --- Card Styling (Glassmorphism) --- */
+      
         .card {
             background: var(--color-surface);
             backdrop-filter: blur(12px);
@@ -155,8 +155,7 @@
         .gauge-text { margin-top: -1.5rem; }
         .gauge-value { font-size: 3rem; font-weight: 700; line-height: 1; }
         .gauge-level { font-size: 1rem; color: var(--color-text-secondary); }
-        
-        /* --- Pollutants & Chart Styling --- */
+      
         #pollutants-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 1rem; }
         .pollutant-card {
             text-align: center; background-color: var(--color-bg);
@@ -247,7 +246,7 @@
             }
         });
 
-        // Use a dedicated function for city searches
+        
         submitBtn.addEventListener('click', handleCitySearch);
         cityInput.addEventListener('keyup', (event) => {
             if (event.key === 'Enter') handleCitySearch();
@@ -258,7 +257,7 @@
             const hour = new Date().getHours();
             const body = document.body;
             
-            // Day is roughly 6am to 7pm (19:00)
+           
             if (hour >= 6 && hour < 19) {
                 // Daytime Sky
                 body.style.backgroundImage = `
