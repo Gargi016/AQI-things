@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQI things</title>
+    
+    <!-- LeafletJS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
+    <!-- Chart.js for Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Color Palette */
+            --color-bg: #111827;
+            --color-surface: rgba(31, 41, 55, 0.5);
+            --color-border: rgba(75, 85, 99, 0.5);
+            --color-text-primary: #f9fafb;
+            --color-text-secondary: #9ca3af;
+            --color-accent: #38bdf8;
+
+            /* AQI Status Colors */
+            --fg-good: #34d399;
+            --fg-moderate: #fbbf24;
+            --fg-unhealthy-sensitive: #fb923c;
+            --fg-unhealthy: #f87171;
+            --fg-very-unhealthy: #c084fc;
+            --fg-hazardous: #f472b6;
+        }
+
+        /* --- Base & Typography --- */
+        * { box-sizing: border-box; }
+        html { font-size: 100%; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--color-bg);
+            color: var(--color-text-primary);
+            margin: 0;
+            padding: 1rem;
+            min-height: 100vh;
+        }
+        h1 { font-size: 1.875rem; font-weight: 700; text-align: center; margin-bottom: 0.5rem; }
+        h3 { font-size: 1.125rem; font-weight: 600; margin-top: 0; margin-bottom: 1rem; }
+
+        /* --- Main Dashboard Layout --- */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            max-width: 1280px;
+            margin: 1.5rem auto;
+        }
+        @media (min-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 2fr 1fr;
+            }
+        }
+
+        /* --- Card Styling (Glassmorphism) --- */
+        .card {
+            background: var(--color-surface);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--color-border);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+
+        /* --- Main Content Area (Map & Search) --- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        #map {
+            width: 100%;
+            height: 500px;
+            border-radius: 1rem;
+            border: 1px solid var(--color-border);
+        }
+        .leaflet-container { background: #1f2937; }
+        .leaflet-control-zoom a { color: var(--color-text-primary) !important; background-color: var(--color-surface) !important; }
+        .leaflet-popup-content-wrapper, .leaflet-popup-tip { background: var(--color-surface) !important; color: var(--color-text-primary) !important; box-shadow: none; border-radius: 0.5rem; }
+
+        /* --- Sidebar (Results) --- */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* --- UI Components --- */
+        .form-container { display: flex; gap: 0.75rem; }
+        #city-input {
+            flex-grow: 1; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid var(--color-border);
+            border-radius: 0.75rem; background-color: var(--color-surface); color: var(--color-text-primary);
+        }
+        #submit-btn {
+            padding: 0.75rem 1.25rem; font-size: 1rem; font-weight: 600; color: var(--color-bg);
+            background-color: var(--color-accent); border: none; border-radius: 0.75rem; cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        #submit-btn:hover { opacity: 0.85; }
+
+        #status-message { text-align: center; min-height: 24px; color: var(--color-text-secondary); }
+        .loader {
+            display: none; margin: 1rem auto; border: 4px solid var(--color-border);
+            border-top: 4px solid var(--color-accent); border-radius: 50%; width: 36px; height: 36px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* --- AQI Gauge Redesign --- */
+        .gauge-container { text-align: center; }
+        .gauge-display {
+            position: relative;
+            width: 200px;
+            height: 100px;
+            margin: 0 auto 1rem auto;
+            overflow: hidden;
+        }
+        .gauge-arc {
+            position: absolute; width: 200px; height: 200px;
+            border-radius: 50%;
+            border: 20px solid var(--color-border);
+            border-bottom-color: transparent;
+            border-left-color: transparent;
+            transform: rotate(-135deg);
+        }
+        .gauge-fill {
+            border-top-color: var(--fg-good);
+            border-right-color: var(--fg-good);
+            transition: transform 1s ease-in-out, border-color 0.5s ease;
+            transform: rotate(-135deg) scale(0);
+        }
+        .gauge-text { margin-top: -1.5rem; }
+        .gauge-value { font-size: 3rem; font-weight: 700; line-height: 1; }
+        .gauge-level { font-size: 1rem; color: var(--color-text-secondary); }
+        
+        /* --- Pollutants & Chart Styling --- */
+        #pollutants-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 1rem; }
+        .pollutant-card {
+            text-align: center; background-color: var(--color-bg);
+            padding: 1rem; border-radius: 0.75rem;
+        }
+        .pollutant-name { font-size: 0.875rem; font-weight: 500; color: var(--color-text-secondary); }
+        .pollutant-value { font-size: 1.5rem; font-weight: 700; }
+        
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- Main content column -->
+        <main class="main-content">
+            <header>
+                <h1>AQI Forecaster Dashboard</h1>
+                <p id="sub-header" style="text-align:center; color: var(--color-text-secondary); margin-top: -0.5rem;">Search for a city or click on the map to get a 24-hour forecast</p>
+            </header>
+            <div class="card">
+                <div id="map"></div>
+            </div>
+        </main>
+        
+        <!-- Sidebar column for results -->
+        <aside class="sidebar">
+            <div class="card">
+                 <div class="form-container">
+                    <input type="text" id="city-input" placeholder="Enter a city name..." />
+                    <button id="submit-btn">Search</button>
+                </div>
+                <div id="status-message"></div>
+                <div class="loader" id="loader"></div>
+            </div>
+
+            <!-- This container will hold all result cards -->
+            <div id="results-container" class="hidden">
+                <div class="card fade-in">
+                    <div class="gauge-container">
+                        <div class="gauge-display">
+                            <div class="gauge-arc"></div>
+                            <div class="gauge-arc gauge-fill" id="gauge-fill"></div>
+                        </div>
+                        <div class="gauge-text">
+                            <div class="gauge-value" id="aqi-value">---</div>
+                            <div class="gauge-level" id="aqi-level">---</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card fade-in" style="margin-top: 1.5rem;">
+                    <h3>Pollutant Breakdown</h3>
+                    <div id="pollutants-grid"></div>
+                </div>
+
+                <div class="card fade-in" style="margin-top: 1.5rem;">
+                    <h3>Forecast</h3>
+                    <canvas id="combined-chart"></canvas>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <script>
+        // --- DOM Element References ---
+        const cityInput = document.getElementById('city-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const statusMessage = document.getElementById('status-message');
+        const loader = document.getElementById('loader');
+        const resultsContainer = document.getElementById('results-container');
+        let combinedChart, map, marker;
+
+        // --- Chart.js Global Config ---
+        Chart.defaults.color = '#9ca3af';
+        Chart.defaults.borderColor = 'rgba(75, 85, 99, 0.5)';
+        
+        // --- Initialization & Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMap();
+            const lastCity = localStorage.getItem('lastCity');
+            if (lastCity) {
+                cityInput.value = lastCity;
+                handleForecastRequest();
+            }
+        });
+
+        submitBtn.addEventListener('click', () => handleForecastRequest());
+        cityInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') handleForecastRequest();
+        });
+
+        // --- Core Functions ---
+        function initializeMap() {
+            map = L.map('map').setView([20, 0], 2); // Default world view
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                maxZoom: 19
+            }).addTo(map);
+            map.on('click', onMapClick);
+        }
+        
+        async function onMapClick(e) {
+            const { lat, lng } = e.latlng;
+            cityInput.value = `📍 Location`;
+            await handleForecastRequest(true, lat, lng);
+        }
+
+        async function handleForecastRequest(isGeo = false, lat = null, lon = null) {
+            const city = cityInput.value.trim();
+            if (!city && !isGeo) {
+                statusMessage.textContent = '⚠️ Please enter a city name.';
+                return;
+            }
+            loader.style.display = 'block';
+            resultsContainer.classList.add('hidden');
+            statusMessage.textContent = `Fetching data...`;
+
+            try {
+                const url = isGeo ? `/forecast/geo/${lat}/${lon}` : `/forecast/${city}`;
+                const response = await fetch(url);
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.message);
+                
+                if (!isGeo) localStorage.setItem('lastCity', city);
+                displayResults(data);
+                statusMessage.textContent = '';
+            } catch (error) {
+                statusMessage.textContent = `❌ Error: ${error.message}`;
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+        
+        // --- UI Update & Helper Functions ---
+        function getAqiInfo(aqi) {
+            if (aqi <= 50) return { level: "Good", color: 'var(--fg-good)' };
+            if (aqi <= 100) return { level: "Moderate", color: 'var(--fg-moderate)' };
+            if (aqi <= 150) return { level: "Unhealthy for Sensitive", color: 'var(--fg-unhealthy-sensitive)' };
+            if (aqi <= 200) return { level: "Unhealthy", color: 'var(--fg-unhealthy)' };
+            if (aqi <= 300) return { level: "Very Unhealthy", color: 'var(--fg-very-unhealthy)' };
+            return { level: "Hazardous", color: 'var(--fg-hazardous)' };
+        }
+
+        function displayResults(data) {
+            resultsContainer.classList.remove('hidden');
+            const aqiInfo = getAqiInfo(data.current_aqi);
+            
+            // 1. Update Map
+            const cityCoords = data.city.geo ? [data.city.geo[0], data.city.geo[1]] : map.getCenter();
+            if (marker) map.removeLayer(marker);
+            marker = L.marker(cityCoords).addTo(map)
+                .bindPopup(`<b>${data.city.name}</b><br>Current AQI: ${data.current_aqi}`)
+                .openPopup();
+            map.flyTo(cityCoords, 10);
+            
+            // 2. Update Gauge
+            document.getElementById('aqi-value').textContent = data.current_aqi;
+            document.getElementById('aqi-level').textContent = aqiInfo.level;
+            const gaugeFill = document.getElementById('gauge-fill');
+            const aqiPercent = Math.min(data.current_aqi, 301) / 301;
+            const rotation = -135 + (aqiPercent * 270);
+            gaugeFill.style.transform = `rotate(${rotation}deg)`;
+            gaugeFill.style.borderColor = aqiInfo.color;
+
+            // 3. Update Pollutants
+            const pollutantsGrid = document.getElementById('pollutants-grid');
+            pollutantsGrid.innerHTML = '';
+            const POLLUTANT_NAMES = { pm25: 'PM₂.₅', o3: 'O₃', no2: 'NO₂', so2: 'SO₂', pm10: 'PM₁₀', co: 'CO' };
+            for (const [key, value] of Object.entries(data.pollutants)) {
+                if (POLLUTANT_NAMES[key] && value !== undefined) {
+                    pollutantsGrid.innerHTML += `
+                        <div class="pollutant-card">
+                            <div class="pollutant-name">${POLLUTANT_NAMES[key]}</div>
+                            <div class="pollutant-value">${value}</div>
+                        </div>`;
+                }
+            }
+
+            // 4. Update Chart
+            const ctx = document.getElementById('combined-chart').getContext('2d');
+            const historyData = { labels: data.history.labels, values: data.history.y };
+            const forecastData = { labels: data.forecast.labels, values: data.forecast.yhat };
+            
+            const lastHistoryValue = historyData.values[historyData.values.length - 1];
+            const forecastDisplayValues = [lastHistoryValue, ...forecastData.values];
+            const forecastPaddedData = Array(historyData.values.length - 1).fill(null).concat(forecastDisplayValues);
+
+            if (combinedChart) combinedChart.destroy();
+            combinedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [...historyData.labels, ...forecastData.labels],
+                    datasets: [
+                        {
+                            label: 'Historical AQI',
+                            data: historyData.values,
+                            borderColor: 'rgba(156, 163, 175, 0.8)',
+                            tension: 0.3,
+                            pointRadius: 0,
+                            fill: false
+                        },
+                        {
+                            label: 'Forecasted AQI',
+                            data: forecastPaddedData,
+                            borderColor: 'var(--color-accent)',
+                            borderDash: [5, 5],
+                            tension: 0.3,
+                            pointRadius: 0,
+                            fill: true,
+                            backgroundColor: 'rgba(56, 189, 248, 0.1)'
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: { type: 'time', time: { unit: 'day' } },
+                        y: { title: { display: true, text: 'AQI' }, beginAtZero: true }
+                    },
+                    plugins: { legend: { display: false } },
+                    interaction: { intersect: false, mode: 'index' }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
