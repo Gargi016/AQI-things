@@ -22,7 +22,7 @@ logging.getLogger('prophet').setLevel(logging.ERROR)
 logging.getLogger('cmdstanpy').setLevel(logging.ERROR)
 
 
-API_KEY = "6bd1df1634a84e8b9ea3281d82d1f870b3ed3c8c"
+API_KEY = ""
 
 
 
